@@ -12,3 +12,31 @@ services:
       - .env
     ports:
      - '5432:5432'
+  redis:
+    image: "redis:7-alpine"
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+  celery:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bash -c "pip install -r requirements.txt && celery -A server worker -l info"
+    depends_on:
+      - db
+      - redis
+
+  web:
+    image: python:3.12-slim
+    container_name: web
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+
+

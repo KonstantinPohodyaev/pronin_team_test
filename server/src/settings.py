@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 from pathlib import Path
 
@@ -22,6 +23,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'server.api.apps.ApiConfig',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'django_redis',
     'server.payment.apps.PaymentConfig',
 ]
 
@@ -57,11 +61,11 @@ WSGI_APPLICATION = 'server.src.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'USER': os.getenv('POSTGRESS_DB', 'pronin'),
-        'PASSWORD': os.getenv('POSTGRESS_PASSWORD', 'pronin'),
-        'NAME': os.getenv('POSTGRESS_DB', 'pronin'),
-        'HOST': os.getenv('POSTGRESS_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRESS_PORT', 5432),
+        'USER': os.getenv('POSTGRES_DB', 'pronin'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'pronin'),
+        'NAME': os.getenv('POSTGRES_DB', 'pronin'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
 
@@ -95,3 +99,38 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_LOCATION', 'redis://redis:6379/1'),
+        'OPTIONS': {
+            'CLEINT_CLASS': 'django_redis.cleint.DefaultCleint',
+        }
+    }
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'example@mail.com'
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+

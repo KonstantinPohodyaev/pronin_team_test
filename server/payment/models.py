@@ -26,11 +26,7 @@ class Payment(DateTimeBaseModel):
         on_delete=models.CASCADE,
         verbose_name='User',
     )
-    amount = models.DecimalField(
-        'Amount of money',
-        max_digits=10,
-        decimal_places=2,
-    )
+    amount = models.PositiveIntegerField('Amount of money')
     comment = models.TextField('User`s comment')
     collect = models.ForeignKey(
         to='payment.Collect',
@@ -65,23 +61,23 @@ class Collect(DateTimeBaseModel):
         max_length=128,
         choices=ReasonChoices.choices,
     )
+    is_finished = models.BooleanField(
+        'Finished status',
+        default=False,
+    )
     description = models.TextField('description')
-    target_amount = models.DecimalField(
+    target_amount = models.PositiveIntegerField(
         'Target amount',
-        max_digits=10,
-        decimal_places=2,
         blank=True,
         null=True,
     )
-    current_amount = models.DecimalField(
-        'Current amount',
-        max_digits=20,
-        decimal_places=2
-    )
-    donators_count = models.PositiveIntegerField('Donators count')
+    current_amount = models.PositiveIntegerField('Current amount', default=0)
+    donators_count = models.PositiveIntegerField('Donators count', default=0)
     image = models.ImageField(
         'Image',
         upload_to='media/collect_image',
+        blank=True,
+        null=True,
     )
 
     class Meta:
