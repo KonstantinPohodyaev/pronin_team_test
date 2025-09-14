@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-c4!wxk(@6m#3&$i#^y0#tl+06u&iivgn^fy3sf4(slw^3)kyl$'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -110,7 +110,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
-    ]
+    ],
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
