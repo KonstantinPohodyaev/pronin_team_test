@@ -1,5 +1,6 @@
 from typing import override
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
@@ -16,8 +17,10 @@ from server.api.tasks import send_email_task
 from server.payment.models import Collect, Payment, User
 
 
+@extend_schema(tags=['Users'])
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     @override
     def get_serializer_class(self) -> ModelSerializer:
@@ -27,6 +30,7 @@ class UserViewset(viewsets.ModelViewSet):
         return UserReadSerializer
 
 
+@extend_schema(tags=['Payments'])
 class PaymentViewSet(
     CachedViewSetMixin,
     mixins.CreateModelMixin,
@@ -57,6 +61,7 @@ class PaymentViewSet(
         send_email_task.delay('payment', payment.pk, self.request.user.email)
 
 
+@extend_schema(tags=['Collects'])
 class CollectViewSet(CachedViewSetMixin, viewsets.ModelViewSet):
     """ViewSet for Collect model with caching utils."""
 

@@ -139,3 +139,25 @@ CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:63
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Collect API',
+    'DESCRIPTION': 'API for collects',
+    'VERSION': "1.0.0",
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {
+            'name': 'Users',
+            'description': 'Creation and management of users',
+        },
+        {
+            'name': 'Collects',
+            'description': 'Creation and management of collects',
+        },
+        {
+            'name': 'Payments',
+            'description': 'Creation and management of payments',
+        },
+    ],
+}
+
