@@ -5,8 +5,7 @@ from typing import override
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from server.payment.models import Payment, Collect, User
-
+from server.payment.models import Collect, Payment, User
 
 VALIDATION_MESSAGE = (
     'Your donation amount {donation_amount} exceeds the target '
@@ -122,7 +121,7 @@ class CollectSerializer(serializers.ModelSerializer):
         model = Collect
         fields = (
             'id',
-            'title', 
+            'title',
             'reason',
             'description',
             'target_amount',

@@ -1,10 +1,11 @@
 import random
-from django.core.management.base import BaseCommand
+
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 from faker import Faker
 
-from server.payment.models import Collect
 from server.payment.choices import ReasonChoices
+from server.payment.models import Collect
 
 User = get_user_model()
 fake = Faker('ru_RU')
@@ -17,10 +18,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         """Method for adding optional args."""
-        parser.add_argument('--users', type=int, default=10, help='Count of users')
-        parser.add_argument('--collects', type=int, default=5, help='Count of collects')
-        parser.add_argument('--payments', type=int, default=50, help='Count of payments')
-        parser.add_argument('--flush', action='store_true', help='Delete db')
+        parser.add_argument(
+            '--users', type=int, default=10, help='Count of users'
+        )
+        parser.add_argument(
+            '--collects', type=int, default=5, help='Count of collects'
+        )
+        parser.add_argument(
+            '--payments', type=int, default=50, help='Count of payments'
+        )
+        parser.add_argument(
+            '--flush', action='store_true', help='Delete db'
+        )
 
     def handle(self, *args, **options):
         """Main logic of full_db command."""
@@ -51,7 +60,9 @@ class Command(BaseCommand):
                 title=fake.sentence(nb_words=3),
                 reason=random.choice(ReasonChoices.values),
                 description=fake.text(max_nb_chars=200),
-                target_amount=random.choice([None, random.randint(5000, 20000)]),
+                target_amount=random.choice(
+                    [None, random.randint(5000, 20000)]
+                ),
                 current_amount=0,
                 donators_count=0,
             )
@@ -67,4 +78,6 @@ class Command(BaseCommand):
                 comment=fake.sentence(nb_words=6),
             )
 
-        self.stdout.write(self.style.SUCCESS('✅ Database was updated and fulled new data!'))
+        self.stdout.write(self.style.SUCCESS(
+            '✅ Database was updated and fulled new data!'
+        ))

@@ -1,8 +1,8 @@
-from django.utils import timezone
 from typing import override
 
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.utils import timezone
 
 from server.payment.choices import ReasonChoices
 

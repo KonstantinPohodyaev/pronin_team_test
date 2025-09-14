@@ -1,7 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
-from server.api.views import UserViewset, PaymentViewSet, CollectViewSet
-
+from server.api.views import CollectViewSet, PaymentViewSet, UserViewset
 
 router = DefaultRouter()
 router.register(
