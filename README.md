@@ -117,7 +117,7 @@ docker compose down
 
 ## Старт
 - создайте пользователя `api/users/` POST
-- получите токен `api/auth/token/` POST
+- получите токен `auth/token/` POST
 - пользуйтесь функционалом сервиса!
 ---
 
