@@ -1,6 +1,6 @@
 from typing import override
 
-from rest_framework import mixins, pagination, permissions, viewsets
+from rest_framework import mixins, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
 from server.api.cache_utils import CachedViewSetMixin
@@ -18,7 +18,6 @@ from server.payment.models import Collect, Payment, User
 
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    pagination_class = pagination.PageNumberPagination
 
     @override
     def get_serializer_class(self) -> ModelSerializer:
@@ -40,7 +39,6 @@ class PaymentViewSet(
     queryset = Payment.objects.all()
     basename = 'payment'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    pagination_class = pagination.PageNumberPagination
 
     @override
     def get_serializer_class(
@@ -66,7 +64,6 @@ class CollectViewSet(CachedViewSetMixin, viewsets.ModelViewSet):
     serializer_class = CollectSerializer
     permission_classes = (AuthorOrReadOnly,)
     basename = 'collect'
-    pagination_class = pagination.PageNumberPagination
 
     @override
     def perform_create(self, serializer: CollectSerializer) -> None:
