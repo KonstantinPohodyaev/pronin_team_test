@@ -1,5 +1,7 @@
+import base64
 from typing import override
 
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from server.payment.models import Payment, Collect, User
@@ -13,6 +15,17 @@ VALIDATION_MESSAGE = (
 CLOSED_COLLECT_MESSAGE = (
     'Collect `{title}` is closed! Thanks for your generosity!'
 )
+
+
+class Base64ImageField(serializers.ImageField):
+    """ImageField for bs64."""
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith("data:image"):
+            format, imgstr = data.split(";base64,")
+            ext = format.split("/")[-1]
+            data = ContentFile(base64.b64decode(imgstr), name=f"upload.{ext}")
+        return super().to_internal_value(data)
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -50,6 +63,9 @@ class UserReadSerializer(BaseUserSerializer):
 
 class CollectSerializer(serializers.ModelSerializer):
     """Serializer for Collect instances."""
+    author = UserReadSerializer(source='user', read_only=True)
+    image = Base64ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Collect
         fields = (
@@ -62,6 +78,8 @@ class CollectSerializer(serializers.ModelSerializer):
             'donators_count',
             'created_at',
             'is_finished',
+            'author',
+            'image',
         )
         read_only_fields = (
             'id',
@@ -69,18 +87,20 @@ class CollectSerializer(serializers.ModelSerializer):
             'donators_count',
             'created_at',
             'is_finished',
+            'author',
         )
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     """Serializer for Payment instances."""
 
-    author = UserReadSerializer(source='user')
-    collect = CollectSerializer()
+    author = UserReadSerializer(source='user', read_only=True)
+    collect = CollectSerializer(read_only=True)
 
     class Meta:
         model = Payment
         fields = ('id', 'amount', 'comment', 'author', 'collect')
+        read_only = fields
 
 
 class PaymentCreateSerializer(serializers.ModelSerializer):

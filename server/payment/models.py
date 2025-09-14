@@ -75,7 +75,7 @@ class Collect(DateTimeBaseModel):
     donators_count = models.PositiveIntegerField('Donators count', default=0)
     image = models.ImageField(
         'Image',
-        upload_to='media/collect_image',
+        upload_to='collect_image/',
         blank=True,
         null=True,
     )

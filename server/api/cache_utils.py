@@ -1,4 +1,4 @@
-from django.core import cache
+from django.core.cache import cache
 from rest_framework.response import Response
 
 
@@ -31,15 +31,17 @@ class CachedViewSetMixin:
 
     def perform_create(self, serializer):
         """Clear cache after creating new instance."""
-        self._clear_cache(serializer.save())
+        self._clear_cache_for(self.basename, serializer.save().pk)
 
     def perform_update(self, serializer):
         """Clear cache after updating instance."""
-        self._clear_cache(serializer.save())
+        self._clear_cache_for(self.basename, serializer.save().pk)
 
-    def perform_destroy(self, serializer):
+    def perform_destroy(self, instance):
         """Clear cache after deleting instance."""
-        self._clear_cache(serializer.save())
+        pk = instance.pk
+        instance.delete()
+        self._clear_cache_for(self.basename, pk)
 
     def _clear_cache_for(self, basename: str, pk: int | None = None):
         """Delete cache after updating data."""

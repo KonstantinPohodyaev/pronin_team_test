@@ -1,6 +1,6 @@
 from typing import override
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, permissions
 from rest_framework.serializers import ModelSerializer
 
 from server.payment.models import Payment, Collect, User
@@ -13,6 +13,7 @@ from server.api.serializers import (
 )
 from server.api.tasks import send_email_task
 from server.api.cache_utils import CachedViewSetMixin
+from server.api.permissions import AuthorOrReadOnly
 
 
 class UserViewset(viewsets.ModelViewSet):
@@ -36,6 +37,8 @@ class PaymentViewSet(
     """ViewSet for Payment model with caching utils."""
 
     queryset = Payment.objects.all()
+    basename = 'payment'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     @override
     def get_serializer_class(
@@ -59,6 +62,8 @@ class CollectViewSet(CachedViewSetMixin, viewsets.ModelViewSet):
 
     queryset = Collect.objects.all()
     serializer_class = CollectSerializer
+    permission_classes = (AuthorOrReadOnly,)
+    basename = 'collect'
 
     @override
     def perform_create(self, serializer: CollectSerializer) -> None:
