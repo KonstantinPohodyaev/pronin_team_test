@@ -115,6 +115,12 @@ docker compose exec -it web python manage.py full_db
 docker compose down
 ```
 
+## Старт
+- создайте пользователя `api/users/` POST
+- получите токен `api/auth/token/` POST
+- пользуйтесь функционалом сервиса!
+---
+
 _Сайт будет доступен по ```http://localhost```_
 
 ---
