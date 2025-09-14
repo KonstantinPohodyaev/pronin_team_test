@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 from typing import override
 
 from django.core.files.base import ContentFile
@@ -61,48 +62,6 @@ class UserReadSerializer(BaseUserSerializer):
         fields = ('username', 'email')
 
 
-class CollectSerializer(serializers.ModelSerializer):
-    """Serializer for Collect instances."""
-    author = UserReadSerializer(source='user', read_only=True)
-    image = Base64ImageField(required=False, allow_null=True)
-
-    class Meta:
-        model = Collect
-        fields = (
-            'id',
-            'title', 
-            'reason',
-            'description',
-            'target_amount',
-            'current_amount',
-            'donators_count',
-            'created_at',
-            'is_finished',
-            'author',
-            'image',
-        )
-        read_only_fields = (
-            'id',
-            'current_amount',
-            'donators_count',
-            'created_at',
-            'is_finished',
-            'author',
-        )
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    """Serializer for Payment instances."""
-
-    author = UserReadSerializer(source='user', read_only=True)
-    collect = CollectSerializer(read_only=True)
-
-    class Meta:
-        model = Payment
-        fields = ('id', 'amount', 'comment', 'author', 'collect')
-        read_only = fields
-
-
 class PaymentCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating Payment instance."""
     collect_id = serializers.IntegerField()
@@ -142,5 +101,59 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         collect.donators_count += 1
         if collect.target_amount == collect.current_amount:
             collect.is_finished = True
+            collect.finished_at = datetime.now()
         collect.save()
         return payment
+
+
+class PaymentShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ('id', 'amount',)
+
+
+class CollectSerializer(serializers.ModelSerializer):
+    """Serializer for Collect instances."""
+    author = UserReadSerializer(source='user', read_only=True)
+    image = Base64ImageField(required=False, allow_null=True)
+    payments = PaymentShortSerializer(many=True)
+
+    class Meta:
+        model = Collect
+        fields = (
+            'id',
+            'title', 
+            'reason',
+            'description',
+            'target_amount',
+            'current_amount',
+            'donators_count',
+            'created_at',
+            'is_finished',
+            'finished_at',
+            'author',
+            'image',
+            'payments',
+        )
+        read_only_fields = (
+            'id',
+            'current_amount',
+            'donators_count',
+            'created_at',
+            'is_finished',
+            'author',
+            'finished_at',
+            'payments',
+        )
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    """Serializer for Payment instances."""
+
+    author = UserReadSerializer(source='user', read_only=True)
+    collect = CollectSerializer(read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = ('id', 'amount', 'comment', 'author', 'collect')
+        read_only = fields

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from typing import override
 
 from django.db import models
@@ -65,6 +66,11 @@ class Collect(DateTimeBaseModel):
         'Finished status',
         default=False,
     )
+    finished_at = models.DateTimeField(
+        'Finish datetime',
+        blank=True,
+        null=True,
+    )
     description = models.TextField('description')
     target_amount = models.PositiveIntegerField(
         'Target amount',
@@ -89,3 +95,19 @@ class Collect(DateTimeBaseModel):
     def __str__(self):
         """Method for display short info of collect instance."""
         return f'{self.title}: {self.current_amount}/{self.target_amount}'
+
+    def add_payment(self, user, amount, comment):
+        """Method for adding payments."""
+        payment = Payment.objects.create(
+            user=user,
+            collect=self,
+            amount=amount,
+            comment=comment,
+        )
+        self.current_amount += amount
+        self.donators_count += 1
+        if self.target_amount and self.current_amount >= self.target_amount:
+            self.is_finished = True
+            self.finished_at = timezone.now()
+        self.save()
+        return payment
